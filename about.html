@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — KenKenKOOK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topnav">
+  <a href="kenken.html" class="brand">
+    <span class="logo">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+        <rect x="3" y="3" width="26" height="26" rx="3" stroke="white" stroke-width="2.6"/>
+        <line x1="12.3" y1="3" x2="12.3" y2="29" stroke="white" stroke-width="2"/>
+        <line x1="21.6" y1="3" x2="21.6" y2="29" stroke="white" stroke-width="2"/>
+        <line x1="3" y1="12.3" x2="29" y2="12.3" stroke="white" stroke-width="2"/>
+        <line x1="3" y1="21.6" x2="29" y2="21.6" stroke="white" stroke-width="2"/>
+      </svg>
+    </span>
+    <span class="name">KenKenKOOK<small>Puzzle Lab</small></span>
+  </a>
+  <nav class="navlinks">
+    <a href="kenken.html">Generator</a>
+    <a href="about.html" class="active">About</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <span class="eyebrow"><span class="dot"></span>About this project</span>
+  <h1>Built for <span class="highlight">competition prep.</span></h1>
+</section>
+
+<main class="container">
+  <article class="about-card">
+    <div class="avatar">AG</div>
+    <h2>Anay Goenka</h2>
+    <p class="role">Year 9 student · KenKen competitor</p>
+
+    <p>
+      Hi, I'm <strong>Anay</strong>. I'm in <strong>Year 9</strong> and I'm preparing for KenKen competitions.
+    </p>
+    <p>
+      I built this tool to give me <strong>basically unlimited KenKens to practice with</strong> — so instead of running out of puzzles or doing the same ones twice, I can sit down, dial in the difficulty, grid size, and the operators I want to drill, and immediately get a fresh printable sheet.
+    </p>
+    <p>
+      Every puzzle the tool produces is solver-verified to have <strong>exactly one solution</strong>, so practice time is never wasted on a broken puzzle. Print sheets come out as a real PDF with exact millimeter layouts, so they look the same on every printer.
+    </p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h4>Always solvable</h4>
+        <p>Every puzzle is verified by a backtracking solver to have exactly one solution.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+        </div>
+        <h4>3×3 to 5×5</h4>
+        <p>Pick your grid size and difficulty to match exactly the level you're practicing.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><rect x="6" y="14" width="12" height="8"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/></svg>
+        </div>
+        <h4>Print-perfect PDF</h4>
+        <p>Layouts of 1, 2, 4, 8, or 16 puzzles per page, drawn at exact mm coordinates.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h4>Drill any operator</h4>
+        <p>Toggle +, −, ×, ÷ to focus on the operations you want to get faster at.</p>
+      </div>
+    </div>
+  </article>
+</main>
+
+<footer class="footer">
+  Built by Anay Goenka · <a href="kenken.html">Back to generator</a>
+</footer>
+
+</body>
+</html>
