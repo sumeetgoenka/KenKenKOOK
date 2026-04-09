@@ -45,7 +45,15 @@ function buildPdf(puzzles, perPage, difficulty, includeSolutions) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 
   const layout = LAYOUTS[perPage];
-  const fonts  = FONT[perPage];
+  // Scale fonts down a touch for denser grids — defaults are tuned for n=4
+  const n = puzzles[0].n;
+  const nScale = Math.max(0.65, Math.min(1.15, 4 / n));
+  const baseFonts = FONT[perPage];
+  const fonts = {
+    title: baseFonts.title,                       // title is per slot, not per cell
+    label: Math.max(4.5, baseFonts.label * (0.5 + 0.5 * nScale)),
+    value: Math.max(6,   baseFonts.value * nScale),
+  };
 
   const slotW = (USABLE.w - layout.gap * (layout.cols - 1)) / layout.cols;
   const slotH = (USABLE.h - layout.gap * (layout.rows - 1)) / layout.rows;

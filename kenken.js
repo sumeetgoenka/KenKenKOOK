@@ -55,7 +55,7 @@ function pickCageSize(difficulty, maxCap) {
 function generateCages(n, difficulty) {
   const cellCage = Array.from({ length: n }, () => Array(n).fill(-1));
   const cages = [];
-  const maxCap = n === 3 ? 4 : (n === 4 ? 4 : 5);
+  const maxCap = n <= 4 ? 4 : 5;  // 3,4 → 4-cell cages max; 5,6 → 5-cell max
 
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
@@ -201,7 +201,7 @@ function renderPuzzle(puz, showValues) {
   }
 
   const grid = document.createElement("div");
-  grid.className = "kk-grid";
+  grid.className = `kk-grid n-${n}`;
   grid.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
   grid.style.gridTemplateRows    = `repeat(${n}, 1fr)`;
 
