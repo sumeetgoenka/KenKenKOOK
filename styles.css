@@ -1,0 +1,207 @@
+:root { --thick: 3px; --thin: 1px; }
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  margin: 0; padding: 20px; color: #222; background: #fafafa;
+}
+
+h1 { text-align: center; margin: 10px 0 20px; font-size: 22px; }
+
+/* ---------- controls ---------- */
+.controls {
+  background: #fff; padding: 16px 20px; border-radius: 8px;
+  max-width: 960px; margin: 0 auto 20px;
+  display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.controls label.field {
+  font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.03em;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.controls select {
+  padding: 6px 10px; font-size: 14px; border-radius: 4px;
+  border: 1px solid #ccc; background: white; min-width: 120px;
+}
+.controls button {
+  cursor: pointer; background: #2563eb; color: white; border: none;
+  padding: 9px 18px; font-weight: 600; font-size: 14px; border-radius: 4px;
+}
+.controls button.secondary { background: #6b7280; }
+.controls button:hover { filter: brightness(1.1); }
+.ops {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.ops-row { display: flex; gap: 12px; font-size: 16px; text-transform: none; color: #222; }
+.ops-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.sol-toggle { font-size: 13px; color: #444; display: flex; align-items: center; gap: 6px; }
+.status { text-align: center; font-size: 13px; color: #888; margin-bottom: 12px; min-height: 18px; }
+
+/* ---------- pages / layout ---------- */
+.page {
+  background: white;
+  max-width: 960px;
+  margin: 0 auto 24px;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.page.solutions h2 {
+  text-align: center; font-size: 16px; margin: 0 0 16px;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #555;
+}
+
+.puzzles-layout { display: grid; gap: 24px; }
+.puzzles-layout.pp-1  { grid-template-columns: 1fr; }
+.puzzles-layout.pp-2  { grid-template-columns: 1fr; }
+.puzzles-layout.pp-4  { grid-template-columns: 1fr 1fr; }
+.puzzles-layout.pp-8  { grid-template-columns: 1fr 1fr; gap: 18px; }
+.puzzles-layout.pp-16 { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+.puzzle-wrap {
+  display: flex; flex-direction: column;
+  min-width: 0; min-height: 0;
+  break-inside: avoid; page-break-inside: avoid;
+}
+.puzzle-title {
+  text-align: center; font-size: 11px; color: #666;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  margin-bottom: 6px; flex: 0 0 auto;
+}
+.grid-holder {
+  flex: 1 1 auto; min-height: 0; min-width: 0;
+  display: grid; place-items: center;
+}
+
+/* ---------- kenken grid ---------- */
+.kk-grid {
+  display: grid;
+  border: var(--thick) solid #000;
+  background: white;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 520px;
+  max-height: 100%;
+}
+.puzzles-layout.pp-4  .kk-grid { max-width: 380px; }
+.puzzles-layout.pp-8  .kk-grid { max-width: 300px; }
+.puzzles-layout.pp-16 .kk-grid { max-width: 220px; }
+
+.kk-cell {
+  position: relative;
+  border: var(--thin) solid #bbb;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 400;
+}
+.kk-cell.tt { border-top:    var(--thick) solid #000; }
+.kk-cell.bt { border-bottom: var(--thick) solid #000; }
+.kk-cell.lt { border-left:   var(--thick) solid #000; }
+.kk-cell.rt { border-right:  var(--thick) solid #000; }
+
+.kk-label {
+  position: absolute; top: 3px; left: 5px;
+  font-size: 12px; font-weight: 700; line-height: 1; color: #111;
+}
+.kk-value { font-size: 1em; color: #111; }
+
+.puzzles-layout.pp-4  .kk-cell  { font-size: 22px; }
+.puzzles-layout.pp-8  .kk-cell  { font-size: 16px; }
+.puzzles-layout.pp-8  .kk-label { font-size: 9px; }
+.puzzles-layout.pp-16 .kk-cell  { font-size: 12px; }
+.puzzles-layout.pp-16 .kk-label { font-size: 7px; top: 1px; left: 2px; }
+
+.solutions .kk-value { color: #333; }
+
+/* =====================================================================
+   PRINT
+   Fills the full page. 1 puzzle = whole page; 2 = stacked halves;
+   4 = 2×2 corners; 8 = 2×4; 16 = 4×4. Solutions on their own pages.
+   ===================================================================== */
+@media print {
+  @page { size: A4; margin: 10mm; }
+
+  html, body { margin: 0; padding: 0; background: white; height: auto; }
+  .no-print, .controls, .status, h1 { display: none !important; }
+
+  .page {
+    background: white;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    /* fill one printed page */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    page-break-after: always;
+    break-after: page;
+  }
+  .page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+  .page.solutions h2 {
+    flex: 0 0 auto;
+    margin: 0 0 4mm;
+    font-size: 12pt;
+  }
+
+  .puzzles-layout {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    gap: 6mm;
+  }
+  .puzzles-layout.pp-1  { grid-template-rows: 1fr;           grid-template-columns: 1fr; }
+  .puzzles-layout.pp-2  { grid-template-rows: 1fr 1fr;       grid-template-columns: 1fr; }
+  .puzzles-layout.pp-4  { grid-template-rows: 1fr 1fr;       grid-template-columns: 1fr 1fr; }
+  .puzzles-layout.pp-8  { grid-template-rows: repeat(4,1fr); grid-template-columns: 1fr 1fr; gap: 5mm; }
+  .puzzles-layout.pp-16 { grid-template-rows: repeat(4,1fr); grid-template-columns: repeat(4,1fr); gap: 3mm; }
+
+  .puzzle-wrap {
+    display: flex;
+    flex-direction: column;
+    min-height: 0; min-width: 0;
+  }
+  .puzzle-title {
+    flex: 0 0 auto;
+    margin-bottom: 1.5mm;
+    font-size: 8pt;
+  }
+  .grid-holder {
+    flex: 1 1 auto;
+    min-height: 0; min-width: 0;
+    display: grid;
+    place-items: center;
+  }
+  .kk-grid {
+    /* square, fit available space in either dimension */
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1 / 1;
+    /* trick to fill: set both dimensions, aspect-ratio keeps square */
+    inline-size: 100%;
+  }
+
+  /* Font sizing for print — scaled by how many puzzles fit */
+  .puzzles-layout.pp-1  .kk-cell  { font-size: 24pt; }
+  .puzzles-layout.pp-1  .kk-label { font-size: 9pt; }
+  .puzzles-layout.pp-2  .kk-cell  { font-size: 20pt; }
+  .puzzles-layout.pp-2  .kk-label { font-size: 8pt; }
+  .puzzles-layout.pp-4  .kk-cell  { font-size: 16pt; }
+  .puzzles-layout.pp-4  .kk-label { font-size: 7pt; }
+  .puzzles-layout.pp-8  .kk-cell  { font-size: 11pt; }
+  .puzzles-layout.pp-8  .kk-label { font-size: 6pt; }
+  .puzzles-layout.pp-16 .kk-cell  { font-size: 8pt; }
+  .puzzles-layout.pp-16 .kk-label { font-size: 5pt; top: 1px; left: 1px; }
+
+  .kk-grid, .kk-cell {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

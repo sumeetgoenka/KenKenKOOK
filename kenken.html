@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KenKen Generator</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1 class="no-print">KenKen Generator</h1>
+
+<div class="controls no-print">
+  <label class="field">Puzzles / page
+    <select id="perPage">
+      <option value="1">1</option>
+      <option value="2" selected>2</option>
+      <option value="4">4</option>
+      <option value="8">8</option>
+      <option value="16">16</option>
+    </select>
+  </label>
+  <label class="field">Difficulty
+    <select id="difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium" selected>Medium</option>
+      <option value="hard">Hard</option>
+      <option value="expert">Expert</option>
+    </select>
+  </label>
+  <label class="field">Grid size
+    <select id="size">
+      <option value="3">3 × 3</option>
+      <option value="4" selected>4 × 4</option>
+      <option value="5">5 × 5</option>
+    </select>
+  </label>
+  <div class="ops">Operators
+    <div class="ops-row">
+      <label><input type="checkbox" class="op" value="+" checked> +</label>
+      <label><input type="checkbox" class="op" value="-" checked> −</label>
+      <label><input type="checkbox" class="op" value="*" checked> ×</label>
+      <label><input type="checkbox" class="op" value="/" checked> ÷</label>
+    </div>
+  </div>
+  <label class="sol-toggle"><input type="checkbox" id="showSol" checked> Include solutions</label>
+  <button id="gen">Generate</button>
+  <button id="print" class="secondary">Print</button>
+</div>
+
+<div class="status no-print" id="status"></div>
+<div id="output"></div>
+
+<script src="kenken.js"></script>
+</body>
+</html>
