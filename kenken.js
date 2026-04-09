@@ -260,6 +260,8 @@ function renderLayout(puzzles, perPage, showValues) {
 }
 
 /* ---------- UI wiring ---------- */
+let latestState = null;  // { puzzles, perPage, difficulty, showSol }
+
 function renderAll() {
   const perPage    = parseInt(document.getElementById("perPage").value, 10);
   const difficulty = document.getElementById("difficulty").value;
@@ -270,6 +272,7 @@ function renderAll() {
   const status     = document.getElementById("status");
 
   output.innerHTML = "";
+  latestState = null;
   status.textContent = "Generating…";
 
   if (!ops.size) {
@@ -310,11 +313,29 @@ function renderAll() {
       output.appendChild(solPage);
     }
 
+    latestState = { puzzles, perPage, difficulty, showSol };
     const ms = Math.round(performance.now() - t0);
     status.textContent = `✓ Generated ${perPage} puzzle${perPage>1?"s":""} in ${ms} ms — each verified to have exactly one solution.`;
   }, 10);
 }
 
+function openPdf() {
+  const status = document.getElementById("status");
+  if (!latestState) {
+    status.textContent = "⚠ Generate puzzles first.";
+    return;
+  }
+  if (typeof window.buildPdf !== "function" || !window.jspdf) {
+    status.textContent = "⚠ PDF library failed to load. Check your internet connection and reload.";
+    return;
+  }
+  const { puzzles, perPage, difficulty, showSol } = latestState;
+  const doc = window.buildPdf(puzzles, perPage, difficulty, showSol);
+  // Open in a new tab so the user can print from their PDF viewer (perfect 1:1 print)
+  const url = doc.output("bloburl");
+  window.open(url, "_blank");
+}
+
 document.getElementById("gen").addEventListener("click", renderAll);
-document.getElementById("print").addEventListener("click", () => window.print());
+document.getElementById("print").addEventListener("click", openPdf);
 renderAll();
