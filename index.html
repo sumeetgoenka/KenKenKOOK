@@ -103,44 +103,69 @@
 
   <div class="controls no-print">
 
-    <div class="field">
-      <label for="perPage">Puzzles / page</label>
-      <select id="perPage">
-        <option value="1">1 per page</option>
-        <option value="2" selected>2 per page</option>
-        <option value="4">4 per page</option>
-        <option value="8">8 per page</option>
-        <option value="16">16 per page</option>
-      </select>
+    <div class="mode-tabs" role="tablist">
+      <button class="mode-tab active" data-mode="quick" role="tab">Quick</button>
+      <button class="mode-tab" data-mode="exam" role="tab">Exam</button>
     </div>
 
-    <div class="field">
-      <label for="difficulty">Difficulty</label>
-      <select id="difficulty">
-        <option value="easy">Easy</option>
-        <option value="medium" selected>Medium</option>
-        <option value="hard">Hard</option>
-        <option value="expert">Expert</option>
-      </select>
+    <div class="mode-panel" id="quickPanel">
+      <div class="quick-grid">
+        <div class="field">
+          <label for="perPage">Puzzles / page</label>
+          <select id="perPage">
+            <option value="1">1 per page</option>
+            <option value="2" selected>2 per page</option>
+            <option value="4">4 per page</option>
+            <option value="8">8 per page</option>
+            <option value="16">16 per page</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="difficulty">Difficulty</label>
+          <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="size">Grid size</label>
+          <select id="size">
+            <option value="3">3 × 3</option>
+            <option value="4" selected>4 × 4</option>
+            <option value="5">5 × 5</option>
+            <option value="6">6 × 6</option>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <div class="field">
-      <label for="size">Grid size</label>
-      <select id="size">
-        <option value="3">3 × 3</option>
-        <option value="4" selected>4 × 4</option>
-        <option value="5">5 × 5</option>
-        <option value="6">6 × 6</option>
-      </select>
+    <div class="mode-panel hidden" id="examPanel">
+      <div class="exam-head">
+        <div>
+          <div class="exam-title">Exam builder</div>
+          <div class="exam-sub">Pick grid size and difficulty for each puzzle. The PDF scales automatically.</div>
+        </div>
+        <button id="addPuzzle" class="ghost small">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Add puzzle
+        </button>
+      </div>
+      <div id="examList" class="exam-list"></div>
     </div>
 
-    <div class="field ops-field">
-      <label>Operators</label>
-      <div class="ops-row">
-        <label><input type="checkbox" class="op" value="+" checked><span>+</span></label>
-        <label><input type="checkbox" class="op" value="-" checked><span>−</span></label>
-        <label><input type="checkbox" class="op" value="*" checked><span>×</span></label>
-        <label><input type="checkbox" class="op" value="/" checked><span>÷</span></label>
+    <div class="shared-row">
+      <div class="field ops-field">
+        <label>Operators</label>
+        <div class="ops-row">
+          <label><input type="checkbox" class="op" value="+" checked><span>+</span></label>
+          <label><input type="checkbox" class="op" value="-" checked><span>−</span></label>
+          <label><input type="checkbox" class="op" value="*" checked><span>×</span></label>
+          <label><input type="checkbox" class="op" value="/" checked><span>÷</span></label>
+        </div>
       </div>
     </div>
 

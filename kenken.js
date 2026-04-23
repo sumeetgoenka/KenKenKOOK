@@ -235,23 +235,43 @@ function renderPuzzle(puz, showValues) {
   return grid;
 }
 
-function renderLayout(puzzles, perPage, showValues) {
+/* Compute a preview layout (cols) that maximises slot area for an A4-ish aspect */
+function previewCols(count) {
+  // Prefer layouts with rows >= cols (portrait-friendly). Exact match to PDF chooser.
+  let best = { cols: 1, rows: count, score: 0 };
+  for (let cols = 1; cols <= count; cols++) {
+    const rows = Math.ceil(count / cols);
+    // A4 usable ratio ~ 190:277
+    const sw = 190 / cols, sh = 277 / rows;
+    const score = Math.min(sw, sh);
+    if (score > best.score) best = { cols, rows, score };
+  }
+  return best.cols;
+}
+
+function renderGroup(puzzles, startIdx, showValues) {
+  const cols = previewCols(puzzles.length);
   const layout = document.createElement("div");
-  layout.className = `puzzles-layout pp-${perPage}`;
-  puzzles.forEach((puz, idx) => {
+  layout.className = "puzzles-layout";
+  layout.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  // Scale max grid size with count (denser → smaller previews)
+  const maxW = Math.max(160, Math.round(520 / cols));
+  puzzles.forEach((puz, i) => {
     const wrap = document.createElement("div");
     wrap.className = "puzzle-wrap";
 
     const title = document.createElement("div");
     title.className = "puzzle-title";
     title.textContent = showValues
-      ? `Solution ${idx + 1}`
-      : `Puzzle ${idx + 1}`;
+      ? `Solution ${startIdx + i + 1}`
+      : `Puzzle ${startIdx + i + 1}`;
     wrap.appendChild(title);
 
     const holder = document.createElement("div");
     holder.className = "grid-holder";
-    holder.appendChild(renderPuzzle(puz, showValues));
+    const grid = renderPuzzle(puz, showValues);
+    grid.style.maxWidth = `${maxW}px`;
+    holder.appendChild(grid);
     wrap.appendChild(holder);
 
     layout.appendChild(wrap);
@@ -259,17 +279,120 @@ function renderLayout(puzzles, perPage, showValues) {
   return layout;
 }
 
-/* ---------- UI wiring ---------- */
-let latestState = null;  // { puzzles, perPage, difficulty, showSol }
+/* Group puzzles by size (n), ascending. Preserves original order index for titles. */
+function groupBySize(puzzles) {
+  const sizes = [...new Set(puzzles.map(p => p.n))].sort((a, b) => a - b);
+  return sizes.map(size => ({
+    size,
+    puzzles: puzzles.filter(p => p.n === size),
+  }));
+}
 
-function renderAll() {
+function renderSections(puzzles, showValues, pageClass) {
+  const groups = groupBySize(puzzles);
+  const page = document.createElement("div");
+  page.className = `page ${pageClass || ""}`.trim();
+
+  // running global index so titles stay sequential across groups
+  // compute starting index for each group based on original order
+  const order = puzzles.map((p, i) => ({ p, i }));
+  groups.forEach(g => {
+    const h = document.createElement("h3");
+    h.className = "size-heading";
+    h.textContent = `${g.size} × ${g.size}`;
+    page.appendChild(h);
+
+    // For preview we just number sequentially by group order.
+    // (puzzle numbers in the PDF also group by size — consistent with the heading scheme.)
+    const startIdx = puzzles.findIndex(p => p === g.puzzles[0]);
+    // Simpler: number within the whole document, starting at the count of all earlier groups.
+    const earlier = groups
+      .slice(0, groups.indexOf(g))
+      .reduce((s, gg) => s + gg.puzzles.length, 0);
+    page.appendChild(renderGroup(g.puzzles, earlier, showValues));
+  });
+
+  return page;
+}
+
+/* ---------- exam builder UI ---------- */
+const DEFAULT_EXAM = [
+  { n: 4, difficulty: "medium" },
+  { n: 4, difficulty: "medium" },
+];
+
+function readExamSpecs() {
+  return [...document.querySelectorAll("#examList .exam-row")].map(row => ({
+    n: parseInt(row.querySelector(".ex-size").value, 10),
+    difficulty: row.querySelector(".ex-diff").value,
+  }));
+}
+
+function renderExamList(specs) {
+  const list = document.getElementById("examList");
+  list.innerHTML = "";
+  specs.forEach((spec, idx) => list.appendChild(examRow(spec, idx)));
+  refreshExamIndices();
+}
+
+function examRow(spec, idx) {
+  const row = document.createElement("div");
+  row.className = "exam-row";
+  row.innerHTML = `
+    <div class="idx">${idx + 1}</div>
+    <select class="ex-size">
+      <option value="3">3 × 3</option>
+      <option value="4">4 × 4</option>
+      <option value="5">5 × 5</option>
+      <option value="6">6 × 6</option>
+    </select>
+    <select class="ex-diff">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+      <option value="expert">Expert</option>
+    </select>
+    <button class="remove" title="Remove" aria-label="Remove">×</button>
+  `;
+  row.querySelector(".ex-size").value = String(spec.n);
+  row.querySelector(".ex-diff").value = spec.difficulty;
+  row.querySelector(".remove").addEventListener("click", () => {
+    if (document.querySelectorAll("#examList .exam-row").length <= 1) return;
+    row.remove();
+    refreshExamIndices();
+  });
+  return row;
+}
+
+function refreshExamIndices() {
+  document.querySelectorAll("#examList .exam-row").forEach((r, i) => {
+    r.querySelector(".idx").textContent = String(i + 1);
+  });
+}
+
+function currentMode() {
+  const active = document.querySelector(".mode-tab.active");
+  return active ? active.dataset.mode : "quick";
+}
+
+function buildSpecs() {
+  if (currentMode() === "exam") {
+    return readExamSpecs();
+  }
   const perPage    = parseInt(document.getElementById("perPage").value, 10);
   const difficulty = document.getElementById("difficulty").value;
   const n          = parseInt(document.getElementById("size").value, 10);
-  const ops        = new Set([...document.querySelectorAll(".op:checked")].map(c => c.value));
-  const showSol    = document.getElementById("showSol").checked;
-  const output     = document.getElementById("output");
-  const status     = document.getElementById("status");
+  return Array.from({ length: perPage }, () => ({ n, difficulty }));
+}
+
+/* ---------- UI wiring ---------- */
+let latestState = null;  // { puzzles, showSol }
+
+function renderAll() {
+  const ops     = new Set([...document.querySelectorAll(".op:checked")].map(c => c.value));
+  const showSol = document.getElementById("showSol").checked;
+  const output  = document.getElementById("output");
+  const status  = document.getElementById("status");
 
   output.innerHTML = "";
   latestState = null;
@@ -284,38 +407,36 @@ function renderAll() {
     return;
   }
 
+  const specs = buildSpecs();
+  if (!specs.length) {
+    status.textContent = "⚠ Add at least one puzzle.";
+    return;
+  }
+
   setTimeout(() => {
     const t0 = performance.now();
     const puzzles = [];
-    for (let k = 0; k < perPage; k++) {
-      const puz = generatePuzzle(n, difficulty, ops);
+    for (const spec of specs) {
+      const puz = generatePuzzle(spec.n, spec.difficulty, ops);
       if (!puz) {
-        status.textContent = "⚠ Could not build a uniquely-solvable puzzle with those settings. Try more operators or a different difficulty.";
+        status.textContent = `⚠ Could not build a uniquely-solvable ${spec.n}×${spec.n} ${spec.difficulty} puzzle. Try more operators or a different difficulty.`;
         return;
       }
       puzzles.push(puz);
     }
 
-    // Puzzles page
-    const puzzlesPage = document.createElement("div");
-    puzzlesPage.className = "page";
-    puzzlesPage.appendChild(renderLayout(puzzles, perPage, false));
-    output.appendChild(puzzlesPage);
-
-    // Solutions page (own printed page)
+    output.appendChild(renderSections(puzzles, false));
     if (showSol) {
-      const solPage = document.createElement("div");
-      solPage.className = "page solutions";
+      const sol = renderSections(puzzles, true, "solutions");
       const h = document.createElement("h2");
       h.textContent = "Solutions";
-      solPage.appendChild(h);
-      solPage.appendChild(renderLayout(puzzles, perPage, true));
-      output.appendChild(solPage);
+      sol.insertBefore(h, sol.firstChild);
+      output.appendChild(sol);
     }
 
-    latestState = { puzzles, perPage, difficulty, showSol };
+    latestState = { puzzles, showSol };
     const ms = Math.round(performance.now() - t0);
-    status.textContent = `✓ Generated ${perPage} puzzle${perPage>1?"s":""} in ${ms} ms — each verified to have exactly one solution.`;
+    status.textContent = `✓ Generated ${puzzles.length} puzzle${puzzles.length>1?"s":""} in ${ms} ms — each verified to have exactly one solution.`;
   }, 10);
 }
 
@@ -329,12 +450,34 @@ function openPdf() {
     status.textContent = "⚠ PDF library failed to load. Check your internet connection and reload.";
     return;
   }
-  const { puzzles, perPage, difficulty, showSol } = latestState;
-  const doc = window.buildPdf(puzzles, perPage, difficulty, showSol);
-  // Open in a new tab so the user can print from their PDF viewer (perfect 1:1 print)
+  const { puzzles, showSol } = latestState;
+  const doc = window.buildPdf(puzzles, showSol);
   const url = doc.output("bloburl");
   window.open(url, "_blank");
 }
+
+/* ---------- mode tabs ---------- */
+document.querySelectorAll(".mode-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".mode-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const mode = tab.dataset.mode;
+    document.getElementById("quickPanel").classList.toggle("hidden", mode !== "quick");
+    document.getElementById("examPanel").classList.toggle("hidden", mode !== "exam");
+  });
+});
+
+document.getElementById("addPuzzle").addEventListener("click", () => {
+  // default new row: mirror last row's selections
+  const last = document.querySelector("#examList .exam-row:last-child");
+  const spec = last
+    ? { n: parseInt(last.querySelector(".ex-size").value, 10), difficulty: last.querySelector(".ex-diff").value }
+    : { n: 4, difficulty: "medium" };
+  const idx = document.querySelectorAll("#examList .exam-row").length;
+  document.getElementById("examList").appendChild(examRow(spec, idx));
+});
+
+renderExamList(DEFAULT_EXAM);
 
 document.getElementById("gen").addEventListener("click", renderAll);
 document.getElementById("print").addEventListener("click", openPdf);
